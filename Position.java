@@ -4,9 +4,10 @@
 
 package chess;
 
+import chess.errors.InvalidPieceColorError;
 import chess.pieces.Piece;
-
 import java.util.Map;
+import java.util.HashMap;
 
 public class Position {
 
@@ -142,6 +143,77 @@ public class Position {
         return this.x == pos.x && this.y == pos.y;
     }
 
+    // Find pawn movements
+    public static Position[] getPawnMoves(Piece p, Board b) {
+        Map<Position, Piece> boardState = b.getBoardState();
+        Position forwardMove = getForwardMove(p, boardState);
+        Position[] forwardDiagonals = getForwardDiagonals(p, boardState);
+        return combinePositionEnumerations(new Position[]{forwardMove}, forwardDiagonals);
+    }
+    private static Position getForwardMove(Piece p, Map<Position, Piece> boardState) throws InvalidPieceColorError {
+        Position currPos = p.getPosition();
+        if (p.getColor().equals(Color.WHITE)) {
+            // white piece, decrement y by 1
+            Position targetPos = new Position(currPos.x, currPos.y-1);
+            boolean targetPosOccupied = boardState.get(targetPos) != null;
+            if (!targetPosOccupied) {
+                return targetPos;
+            }
+        } else if (p.getColor().equals(Color.BLACK)) {
+            // black piece, increment y by 1
+            Position targetPos = new Position(currPos.x, currPos.y+1);
+            boolean targetPosOccupied = boardState.get(targetPos) != null;
+            if (!targetPosOccupied) {
+                return targetPos;
+            }
+        } else {
+            throw new InvalidPieceColorError(p.getColor());
+        }
+        return null;
+    }
+    private static Position[] getForwardDiagonals(Piece p, Map<Position, Piece> boardState) throws InvalidPieceColorError {
+        // todo: implement en passant
+        Position currPos = p.getPosition();
+        String color = p.getColor();
+        Position[] ret = new Position[2];
+        if (color.equals(Color.WHITE)) {
+            Position targetPosLeft = new Position(currPos.x-1, currPos.y-1);
+            Position targetPosRight = new Position(currPos.x+1, currPos.y-1);
+            Piece pieceAtLeftPos = boardState.get(targetPosLeft);
+            Piece pieceAtRightPos = boardState.get(targetPosRight);
+            populatePawnDiagonalValues(ret, targetPosLeft, targetPosRight, pieceAtLeftPos, pieceAtRightPos, p);
+        } else if (color.equals(Color.BLACK)) {
+            Position targetPosLeft = new Position(currPos.x+1, currPos.y+1);
+            Position targetPosRight = new Position(currPos.x-1, currPos.y+1);
+            Piece pieceAtLeftPos = boardState.get(targetPosLeft);
+            Piece pieceAtRightPos = boardState.get(targetPosRight);
+            populatePawnDiagonalValues(ret, targetPosLeft, targetPosRight, pieceAtLeftPos, pieceAtRightPos, p);
+        } else {
+            throw new InvalidPieceColorError(p.getColor());
+        }
+        return ret;
+    }
+    private static void populatePawnDiagonalValues(Position[] ret, Position targetPosLeft, Position targetPosRight, Piece pieceAtLeftPos, Piece pieceAtRightPos, Piece p) {
+        if (isMoreLeft(p.getPosition(), p.getColor()) && isMoreRight(p.getPosition(), p.getColor())) {
+            if ((pieceAtLeftPos != null && pieceAtLeftPos.isOpposing(p)) && (pieceAtRightPos != null && pieceAtRightPos.isOpposing(p))) {
+                ret[0] = targetPosLeft;
+                ret[1] = targetPosRight;
+            } else if (pieceAtLeftPos != null && pieceAtLeftPos.isOpposing(p)) {
+                ret[0] = targetPosLeft;
+            } else if (pieceAtRightPos != null && pieceAtRightPos.isOpposing(p)) {
+                ret[0] = targetPosRight;
+            }
+        } else if (isMoreLeft(p.getPosition(), p.getColor())) {
+            if (pieceAtLeftPos != null && pieceAtLeftPos.isOpposing(p)) {
+                ret[0] = targetPosLeft;
+            }
+        } else if (isMoreRight(p.getPosition(), p.getColor())) {
+            if (pieceAtRightPos != null && pieceAtRightPos.isOpposing(p)) {
+                ret[0] = targetPosRight;
+            }
+        }
+    }
+
     // Find horizontal movements at a given position
     public static Position[] getHorizontals(Piece p, Board b) {
         return getHorizontals(p,  b, Board.WIDTH);
@@ -206,7 +278,7 @@ public class Position {
 
     // Find diagonal movements at a given position
     public static Position[] getDiagonals(Piece p, Board b) {
-        return getDiagonals(p,  b, Board.HEIGHT);
+        return getDiagonals(p,  b, Board.DIAGONAL);
     }
     public static Position[] getDiagonals(Piece p, Board b, int limit) {
         // Populate both diagonals separately
@@ -299,8 +371,6 @@ public class Position {
         }
     }
 
-    // Find vertical movements at a given position
-
     // Combine non-null values from multiple position arrays
     public static Position[] combinePositionEnumerations(Position[] ... arrs) {
         int[] counts = new int[arrs.length];
@@ -326,17 +396,41 @@ public class Position {
     }
 
     // Determine whether there are any more positions left/right/up/down from given position
-    private static boolean isMoreLeft(Position pos) {
-        return pos.x != DIR_MIN;
+    private static boolean isMoreLeft(Position pos, String color) throws InvalidPieceColorError {
+        if (color.equals(Color.WHITE)) {
+            return pos.x != DIR_MIN;
+        } else if (color.equals(Color.BLACK)) {
+            return pos.x != DIR_MAX;
+        } else {
+            throw new InvalidPieceColorError(color);
+        }
     }
-    private static boolean isMoreRight(Position pos) {
-        return pos.x != DIR_MAX;
+    private static boolean isMoreRight(Position pos, String color) throws InvalidPieceColorError {
+        if (color.equals(Color.WHITE)) {
+            return pos.x != DIR_MAX;
+        } else if (color.equals(Color.BLACK)) {
+            return pos.x != DIR_MIN;
+        } else {
+            throw new InvalidPieceColorError(color);
+        }
     }
-    private static boolean isMoreUp(Position pos) {
-        return pos.y != DIR_MIN;
+    private static boolean isMoreUp(Position pos, String color) throws InvalidPieceColorError {
+        if (color.equals(Color.WHITE)) {
+            return pos.y != DIR_MIN;
+        } else if (color.equals(Color.BLACK)) {
+            return pos.y != DIR_MAX;
+        } else {
+            throw new InvalidPieceColorError(color);
+        }
     }
-    private static boolean isMoreDown(Position pos) {
-        return pos.y != DIR_MAX;
+    private static boolean isMoreDown(Position pos, String color) throws InvalidPieceColorError {
+        if (color.equals(Color.WHITE)) {
+            return pos.y != DIR_MAX;
+        } else if (color.equals(Color.BLACK)) {
+            return pos.y != DIR_MIN;
+        } else {
+            throw new InvalidPieceColorError(color);
+        }
     }
 
 }
