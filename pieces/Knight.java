@@ -66,8 +66,7 @@ public class Knight extends GenericPiece {
     @Override
     public Position[] getMoves(Board b) {
         // Knight can move 2-1 in any non-diagonal direction
-        Position[] moves = Position.getKnightMoves(this, b);
-        return Position.combinePositionEnumerations(moves);
+        return Position.getKnightMoves(this, b);
     }
 
     // Indicates whether given piece is on opposing team

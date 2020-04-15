@@ -66,8 +66,7 @@ public class Pawn extends GenericPiece {
     @Override
     public Position[] getMoves(Board b) {
         // Pawns can move 1 forward, can take 1 diagonally (including en passant)
-        Position[] moves = Position.getPawnMoves(this, b);
-        return Position.combinePositionEnumerations(moves);
+        return Position.getPawnMoves(this, b);
     }
 
     // Indicates whether given piece is on opposing team

@@ -7,7 +7,6 @@ package chess;
 import chess.errors.InvalidPieceColorError;
 import chess.pieces.Piece;
 import java.util.Map;
-import java.util.HashMap;
 
 public class Position {
 
@@ -212,6 +211,45 @@ public class Position {
                 ret[0] = targetPosRight;
             }
         }
+    }
+
+    // Find knight movements
+    public static Position[] getKnightMoves(Piece p, Board b) {
+        Map<Position, Piece> boardState = b.getBoardState();
+        Position[] moves = new Position[8];
+        Position currPos = p.getPosition();
+        // 1. get all possible positions
+        if (p.getColor().equals(Color.WHITE)) {
+            // Left 2, x
+            moves[0] = new Position(currPos.x-2, currPos.y-1);
+            moves[1] = new Position(currPos.x-2, currPos.y+1);
+            // Right 2, x
+            moves[2] = new Position(currPos.x+2, currPos.y-1);
+            moves[3] = new Position(currPos.x+2, currPos.y+1);
+            // Up 2, x
+            moves[4] = new Position(currPos.x-1, currPos.y-2);
+            moves[5] = new Position(currPos.x+1, currPos.y-2);
+            // Down 2, x
+            moves[6] = new Position(currPos.x-1, currPos.y+2);
+            moves[7] = new Position(currPos.x+1, currPos.y+2);
+        }
+        // 2. filter out invalid positions
+        for (int i=0; i<moves.length; i++) {
+            if (!moves[i].isValid()) {
+                moves[i] = null;
+            }
+        }
+        // 3. filter out moves that attack friendlies
+        for (int i=0; i<moves.length; i++) {
+            if (moves[i] != null) {
+                Piece pieceAtTargetPos = boardState.get(moves[i]);
+                if (!pieceAtTargetPos.isOpposing(p)) {
+                    moves[i] = null;
+                }
+            }
+        }
+        // 4. return minimized array
+        return combinePositionEnumerations(moves);
     }
 
     // Find horizontal movements at a given position
