@@ -13,10 +13,6 @@ public class Pawn extends GenericPiece {
     // Constants
     public static final int VALUE = 1;
 
-    // Attributes
-    private String color;
-    private Position position;
-
     // Constructor
     public Pawn(String color, Position pos) {
         super(color);

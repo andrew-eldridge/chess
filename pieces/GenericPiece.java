@@ -11,8 +11,8 @@ import chess.errors.InvalidPiecePositionError;
 public class GenericPiece implements Piece {
 
     // Attributes
-    private String color;
-    private Position position;
+    protected String color;
+    protected Position position;
 
     // Constructor
     public GenericPiece(String color) {

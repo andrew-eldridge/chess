@@ -13,17 +13,13 @@ public class Rook extends GenericPiece {
     // Constants
     public static final int VALUE = 5;
 
-    // Attributes
-    private String color;
-    private Position position;
-
     // Constructor
     public Rook(String color, Position pos) {
         super(color);
         initPosition(pos);
     }
     private void initPosition(Position pos) throws InvalidPiecePositionError, InvalidPieceColorError {
-        if (this.color.equals(Color.WHITE)) {
+        if (super.color.equals(Color.WHITE)) {
             if (pos.equals(Position.A1) || pos.equals(Position.H1) || pos.getY() == 0) {
                 setPosition(pos);
             } else {

@@ -23,6 +23,7 @@ public class Board {
     public Board() {
         boardState = new HashMap<Position, Piece>();
         initPieces();
+        GUI gui = new GUI();
     }
 
     // Initialize pieces on game board

@@ -13,10 +13,6 @@ public class Knight extends GenericPiece {
     // Constants
     public static final int VALUE = 3;
 
-    // Attributes
-    private String color;
-    private Position position;
-
     // Constructor
     public Knight(String color, Position pos) {
         super(color);

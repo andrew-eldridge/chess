@@ -13,10 +13,6 @@ public class King extends GenericPiece {
     // Constants
     public static final int VALUE = 100;
 
-    // Attributes
-    private String color;
-    private Position position;
-
     // Constructor
     public King(String color, Position pos) {
         super(color);

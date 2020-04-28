@@ -13,10 +13,6 @@ public class Bishop extends GenericPiece {
     // Constants
     public static final int VALUE = 3;
 
-    // Attributes
-    private String color;
-    private Position position;
-
     // Constructor
     public Bishop(String color, Position pos) {
         super(color);

@@ -13,10 +13,6 @@ public class Queen extends GenericPiece {
     // Constants
     public static final int VALUE = 9;
 
-    // Attributes
-    private String color;
-    private Position position;
-
     // Constructor
     public Queen(String color, Position pos) {
         super(color);
